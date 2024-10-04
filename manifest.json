@@ -1,0 +1,16 @@
+{
+  "manifest_version": 3,
+  "name": "Hotelkit Notification Deleter",
+  "version": "1.0",
+  "background": {
+    "service_worker": "./dist/background.js" // Compiled JS file from TS
+  },
+  "action": {
+    "default_icon": "./assets/action_icon.png",
+    "default_popup": "./dist/popup.html"
+  },
+  "permissions": [
+    "tabs",
+    "scripting"
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "ES6",            // Specify the ECMAScript target version
+    "module": "ESNext",         // Specify module code generation
+    "outDir": "./dist",         // Directory where compiled JS files will be saved
+    "rootDir": "./src",         // Directory where your TypeScript source files are located
+    "esModuleInterop": true,    // Allow import/export statements
+    "strict": true,             // Enable strict type checking
+    "skipLibCheck": true,       // Skip checking types of libraries
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["./src/**/*.ts"],    // Include all TypeScript files in src directory
+  "exclude": ["./node_modules"]    // Exclude node_modules folder
+}
