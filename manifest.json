@@ -11,6 +11,11 @@
   },
   "permissions": [
     "tabs",
-    "scripting"
+    "scripting",
+    "cookies"
+  ],
+  "host_permissions": [
+    "https://bgozh.hotelkit.net/*" // Needed to access cookies
   ]
+
 }
