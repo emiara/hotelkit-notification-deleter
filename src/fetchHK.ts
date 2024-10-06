@@ -1,4 +1,11 @@
+function formatCookies(cookies: chrome.cookies.Cookie[]): string {
+  return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+}
 export async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data: string) {
+  let xxsrftoken = cookies.find((cookie) => {
+    return cookie.name == "XSRF-TOKEN"
+  })?.value ?? (() => { throw new Error("XSRF-TOKEN could not be found!") })();
+
   fetch(url, {
     "headers": {
       //"accept": "application/json, text/plain, */*",
@@ -12,8 +19,8 @@ export async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data: 
       //"sec-fetch-mode": "cors",
       //"sec-fetch-site": "same-origin",
       //"x-hotelkit-app": "93",
-      "x-xsrf-token": "873476dc36c1fb3e210a3014a7ee8145a8a4e2573370a8ab353c0c98c5ef9edde266b04cf7b125827be14fe5ae42a161a2c761653d4ca837eaba7c0da06df772",
-      "cookie": "SI=a0dcq4og690ck9qi4sf60rr5d8; XSRF-TOKEN=873476dc36c1fb3e210a3014a7ee8145a8a4e2573370a8ab353c0c98c5ef9edde266b04cf7b125827be14fe5ae42a161a2c761653d4ca837eaba7c0da06df772; refreshToken=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlMWJhODFiZi0wNjA5LTRhYWQtYTk2MC1jOGIwZjY2MTAxNWQiLCJpc1JlZnJlc2giOnRydWUsImlhdCI6MTcyODIzMDY5MCwiZXhwIjoxNzI4MzE3MDkwfQ.vNF_Po-LMulJrv9mCN3fV4PHKEC4SrL9RSqM4HJr6Ik",
+      "x-xsrf-token": xxsrftoken,
+      "cookie": formatCookies(cookies)
       //"Referer": "https://bgozh.hotelkit.net/",
       //"Referrer-Policy": "strict-origin-when-cross-origin"
     },

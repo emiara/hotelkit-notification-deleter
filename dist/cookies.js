@@ -8,24 +8,17 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 /**
- * Retrieves the session ID (cookie named "SI") for a given URL.
+ * Retrieves the given cookiegiven cookie  for a given URL.
  * @param {string} url - The URL of the target website.
- * @returns {Promise<chrome.cookies.Cookie | null>} - The session ID cookie (if found), or null.
+ * @param {string} cookieName - The name of the cookie
+ * @returns {Promise<string>} - The cookie value (if found), or null.
  */
-export function getSessionId(url) {
+export function getCookie(url, cookieName) {
     return __awaiter(this, void 0, void 0, function* () {
-        let si = yield chrome.cookies.get({ url: url, name: "SI" });
-        return si;
-    });
-}
-/**
- * Retrieves all cookies for a given domain.
- * @param {string} url - The URL or domain of the target website.
- * @returns {Promise<chrome.cookies.Cookie[]>} - A list of cookies for the given URL/domain.
- */
-export function getCookie(url) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let cookies = yield chrome.cookies.getAll({ domain: url });
-        return cookies;
+        let cookie = yield chrome.cookies.get({ url: url, name: cookieName });
+        if (!cookie) {
+            throw new Error("Could not get cookie named " + cookieName);
+        }
+        return cookie;
     });
 }

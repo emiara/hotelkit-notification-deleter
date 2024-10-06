@@ -1,19 +1,13 @@
 /**
- * Retrieves the session ID (cookie named "SI") for a given URL.
+ * Retrieves the given cookiegiven cookie  for a given URL.
  * @param {string} url - The URL of the target website.
- * @returns {Promise<chrome.cookies.Cookie | null>} - The session ID cookie (if found), or null.
+ * @param {string} cookieName - The name of the cookie
+ * @returns {Promise<string>} - The cookie value (if found), or null.
  */
-export async function getSessionId(url: string): Promise<chrome.cookies.Cookie | null> { //TODO: Figure out if it is possible to get Session ID from @function getCookie()
-  let si = await chrome.cookies.get({ url: url, name: "SI" });
-  return si;
-}
-
-/**
- * Retrieves all cookies for a given domain.
- * @param {string} url - The URL or domain of the target website.
- * @returns {Promise<chrome.cookies.Cookie[]>} - A list of cookies for the given URL/domain.
- */
-export async function getCookie(url: string): Promise<chrome.cookies.Cookie[]> {
-  let cookies = await chrome.cookies.getAll({ domain: url });
-  return cookies;
+export async function getCookie(url: string, cookieName: string): Promise<chrome.cookies.Cookie> { //TODO: Figure out if it is possible to get Session ID from @function getCookie()
+  let cookie = await chrome.cookies.get({ url: url, name: cookieName });
+  if (!cookie) {
+    throw new Error("Could not get cookie named " + cookieName);
+  }
+  return cookie
 }
