@@ -3,7 +3,7 @@
  * @param {string} url - The URL of the target website.
  * @returns {Promise<chrome.cookies.Cookie | null>} - The session ID cookie (if found), or null.
  */
-export async function getSessionId(url: string): Promise<chrome.cookies.Cookie | null> {
+export async function getSessionId(url: string): Promise<chrome.cookies.Cookie | null> { //TODO: Figure out if it is possible to get Session ID from @function getCookie()
   let si = await chrome.cookies.get({ url: url, name: "SI" });
   return si;
 }
