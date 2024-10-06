@@ -28,6 +28,7 @@ deleteAll.onclick = async function(event) {
   const bgozhURL = "https://bgozh.hotelkit.net/notifications";
 
   // Use the unwrapped cookies directly here
-  const notifications = await HK.fetchHK(new URL(bgozhURL + "/all"), cookies, '{"type":"Notifications"}');
+  const payload = { type: "notifications" };
+  const notifications = await HK.fetchHK(new URL(bgozhURL + "/all"), cookies, JSON.stringify(payload));
   console.log(notifications);
 }

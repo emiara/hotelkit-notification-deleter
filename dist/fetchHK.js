@@ -20,7 +20,7 @@ export function fetchHK(url, cookies, data) {
             "headers": {
                 //"accept": "application/json, text/plain, */*",
                 //"cache-control": "no-cache",
-                "content-type": "application/json;charset=UTF-8",
+                //"content-type": "application/json;charset=UTF-8",
                 //"pragma": "no-cache",
                 //"sec-ch-ua": "\"Chromium\";v=\"129\", \"Not=A?Brand\";v=\"8\"",
                 //"sec-ch-ua-mobile": "?0",
@@ -30,7 +30,7 @@ export function fetchHK(url, cookies, data) {
                 //"sec-fetch-site": "same-origin",
                 //"x-hotelkit-app": "93",
                 "x-xsrf-token": xxsrftoken,
-                "cookie": formatCookies(cookies)
+                //"cookie": formatCookies(cookies)
                 //"Referer": "https://bgozh.hotelkit.net/",
                 //"Referrer-Policy": "strict-origin-when-cross-origin"
             },

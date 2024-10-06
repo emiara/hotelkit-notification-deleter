@@ -32,7 +32,8 @@ deleteAll.onclick = function (event) {
         console.log(cookies);
         const bgozhURL = "https://bgozh.hotelkit.net/notifications";
         // Use the unwrapped cookies directly here
-        const notifications = yield HK.fetchHK(new URL(bgozhURL + "/all"), cookies, '{"type":"Notifications"}');
+        const payload = { type: "notifications" };
+        const notifications = yield HK.fetchHK(new URL(bgozhURL + "/all"), cookies, JSON.stringify(payload));
         console.log(notifications);
     });
 };
