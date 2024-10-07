@@ -7,7 +7,8 @@
     "esModuleInterop": true,    // Allow import/export statements
     "strict": true,             // Enable strict type checking
     "skipLibCheck": true,       // Skip checking types of libraries
-    "forceConsistentCasingInFileNames": true
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true
   },
   "include": ["./src/**/*.ts"],    // Include all TypeScript files in src directory
   "exclude": ["./node_modules"]    // Exclude node_modules folder
