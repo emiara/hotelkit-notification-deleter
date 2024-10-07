@@ -41,7 +41,7 @@ async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string
 
     return await response.json()
   } catch (SyntaxError) {
-    console.warn("No JSON response recieved, probably a delete POST")
+    console.log("No JSON response recieved, probably a delete POST")
     return undefined
   }
 }
