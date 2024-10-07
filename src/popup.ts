@@ -25,9 +25,9 @@ deleteAll.onclick = async function(event) {
   const cookies = await getAllCookies(); // Wait for the cookies to be retrieved
   console.log(cookies);
 
-  const bgozhURL = "https://bgozh.hotelkit.net/notifications";
+  const bgozhURL = "https://bgozh.hotelkit.net";
 
   const payload = { type: "notifications" };
-  const notifications = await HK.fetchHK(new URL(bgozhURL + "/all"), cookies, JSON.stringify(payload));
+  const notifications = await HK.fetchHK(new URL(bgozhURL + "/notifications/all"), cookies, JSON.stringify(payload));
   console.log(notifications);
 }
