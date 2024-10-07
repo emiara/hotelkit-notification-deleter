@@ -7,7 +7,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-import * as cookies from "./cookies.js";
+import * as Cookies from "./cookies.js";
 import * as HK from "./fetchHK.js";
 function getAllCookies() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -15,7 +15,7 @@ function getAllCookies() {
         const bgozhURL = "https://bgozh.hotelkit.net";
         // Create an array of promises
         const cookiePromises = cookieNames.map((cookie) => {
-            return cookies.getCookie(bgozhURL, cookie);
+            return Cookies.getCookie(bgozhURL, cookie);
         });
         // Wait for all promises to resolve and return the array of cookies
         return Promise.all(cookiePromises);
@@ -27,12 +27,23 @@ if (!deleteAll) {
 }
 deleteAll.onclick = function (event) {
     return __awaiter(this, void 0, void 0, function* () {
-        const bgozhURL = "https://bgozh.hotelkit.net/notifications";
+        console.log("Get all cookies:");
+        const cookies = yield getAllCookies(); // Wait for the cookies to be retrieved
+        console.log(cookies);
+        // Get the Notifcations
+        const bgozhURL = new URL("https://bgozh.hotelkit.net");
         const payload = { type: "notifications" };
-        const notifications = yield HK.fetchHK(new URL(bgozhURL + "/all"), cookies.getCookie("XSRF-TOKEN"), JSON.stringify(payload));
-        const notificationIDs = notifications.map((notification) => {
-            console.log(notification);
+        const notifications = yield HK.fetchAllNotifications(bgozhURL, cookies, JSON.stringify(payload));
+        // Get the notificationIDs
+        let notificationIDs = [];
+        for (const noti of notifications) {
+            notificationIDs.push(...noti.notificationIDs);
+        }
+        console.log("NotificationIds: " + notificationIDs);
+        // Delete the notifications 
+        notificationIDs.forEach(id => {
+            const response = HK.deleteNotification(bgozhURL, cookies, id);
+            console.log("response: " + response);
         });
-        console.log(notifications);
     });
 };

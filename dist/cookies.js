@@ -15,6 +15,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
  */
 export function getCookie(url, cookieName) {
     return __awaiter(this, void 0, void 0, function* () {
+        console.log("cookiename: " + cookieName);
         let cookie = yield chrome.cookies.get({ url: url, name: cookieName });
         if (!cookie) {
             throw new Error("Could not get cookie named " + cookieName);

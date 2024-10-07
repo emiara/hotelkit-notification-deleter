@@ -1,37 +1,68 @@
-import * as Cookies from "./cookies.js"
+import * as Cookies from "./cookies.js";
 
-function formatCookies(cookies: chrome.cookies.Cookie[]): string {
-  return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
+interface Notification {
+  headline: string;
+  actionTypes: string[];
+  texts: string[];
+  actions: {
+    userID: string;
+    text: string;
+  }[];
+  itemType: string;
+  itemID: string;
+  timestamp: number;
+  kitID: string;
+  notificationIDs: string[];
+  info: any[];
+  priority: number;
+  hash: string;
+  userID: string;
 }
-export async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data: string) {
-  let xxsrftoken = cookies.find((cookie) => {
-    return cookie.name == "XSRF-TOKEN"
-  })?.value ?? (() => { throw new Error("XSRF-TOKEN could not be found!") })();
 
-  fetch(url, {
-    "headers": {
-      //"accept": "application/json, text/plain, */*",
-      //"cache-control": "no-cache",
-      //"content-type": "application/json;charset=UTF-8",
-      //"pragma": "no-cache",
-      //"sec-ch-ua": "\"Chromium\";v=\"129\", \"Not=A?Brand\";v=\"8\"",
-      //"sec-ch-ua-mobile": "?0",
-      //"sec-ch-ua-platform": "\"macOS\"",
-      //"sec-fetch-dest": "empty",
-      //"sec-fetch-mode": "cors",
-      //"sec-fetch-site": "same-origin",
-      //"x-hotelkit-app": "93",
+// Shared fetchHK function
+async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string): Promise<any> {
+  let xxsrftoken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")?.value ?? (() => { throw new Error("XSRF-TOKEN could not be found!"); })();
+
+  const response = await fetch(url, {
+    headers: {
       "x-xsrf-token": xxsrftoken,
-      //"cookie": formatCookies(cookies)
-      //"Referer": "https://bgozh.hotelkit.net/",
-      //"Referrer-Policy": "strict-origin-when-cross-origin"
+      "Content-Type": "application/json" // Set content type for JSON
     },
-    "body": data,
-    "method": "POST"
-  }).then((response) => {
-    if (!response.ok) {
-      throw new Error(`Response failed with status: ${response.status}`);
-    }
-    return response.json()
-  })
+    body: data,
+    method: "POST",
+  });
+
+  if (!response.ok) {
+    const errorResponse = await response.json();
+    throw new Error(`Response failed with status: ${response.status}. Error: ${JSON.stringify(errorResponse)}`);
+  }
+
+  try {
+
+    return await response.json()
+  } catch (SyntaxError) {
+    console.warn("No JSON response recieved, probably a delete POST")
+    return undefined
+  }
+}
+
+// Function to fetch all notifications
+export async function fetchAllNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
+  const jsonResponse = await fetchHK(new URL("/notifications/all", url), cookies, data);
+  return jsonResponse.notifications as Notification[];
+}
+
+// Function to delete a notification
+export async function deleteNotification(url: URL, cookies: chrome.cookies.Cookie[], notificationID: string): Promise<void | { success: boolean; hash: string }> {
+  const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, JSON.stringify({ notificationID }));
+
+  // Check for success condition
+  if (jsonResponse && jsonResponse.success === false) {
+    return {
+      success: false,
+      hash: jsonResponse.hash, // Return hash on failure
+    };
+  }
+
+  return; // Return nothing on success
 }
