@@ -27,13 +27,12 @@ if (!deleteAll) {
 }
 deleteAll.onclick = function (event) {
     return __awaiter(this, void 0, void 0, function* () {
-        console.log("Get all cookies:");
-        const cookies = yield getAllCookies(); // Wait for the cookies to be retrieved
-        console.log(cookies);
         const bgozhURL = "https://bgozh.hotelkit.net/notifications";
-        // Use the unwrapped cookies directly here
         const payload = { type: "notifications" };
-        const notifications = yield HK.fetchHK(new URL(bgozhURL + "/all"), cookies, JSON.stringify(payload));
+        const notifications = yield HK.fetchHK(new URL(bgozhURL + "/all"), cookies.getCookie("XSRF-TOKEN"), JSON.stringify(payload));
+        const notificationIDs = notifications.map((notification) => {
+            console.log(notification);
+        });
         console.log(notifications);
     });
 };

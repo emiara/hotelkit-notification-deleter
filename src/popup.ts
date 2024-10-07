@@ -1,4 +1,4 @@
-import * as cookies from "./cookies.js";
+import * as Cookies from "./cookies.js";
 import * as HK from "./fetchHK.js";
 
 async function getAllCookies(): Promise<chrome.cookies.Cookie[]> {
@@ -7,7 +7,7 @@ async function getAllCookies(): Promise<chrome.cookies.Cookie[]> {
 
   // Create an array of promises
   const cookiePromises = cookieNames.map((cookie) => {
-    return cookies.getCookie(bgozhURL, cookie);
+    return Cookies.getCookie(bgozhURL, cookie);
   });
 
   // Wait for all promises to resolve and return the array of cookies
@@ -27,7 +27,6 @@ deleteAll.onclick = async function(event) {
 
   const bgozhURL = "https://bgozh.hotelkit.net/notifications";
 
-  // Use the unwrapped cookies directly here
   const payload = { type: "notifications" };
   const notifications = await HK.fetchHK(new URL(bgozhURL + "/all"), cookies, JSON.stringify(payload));
   console.log(notifications);

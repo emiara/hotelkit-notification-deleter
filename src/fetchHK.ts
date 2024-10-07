@@ -1,3 +1,5 @@
+import * as Cookies from "./cookies.js"
+
 function formatCookies(cookies: chrome.cookies.Cookie[]): string {
   return cookies.map(cookie => `${cookie.name}=${cookie.value}`).join('; ');
 }
