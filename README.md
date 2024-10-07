@@ -1,25 +1,23 @@
-# -- Hotelkit Notification Deleter --
+# Hotelkit Notification Deleter
 
-Chrome plugin for adding a "delete all" feature to
-Hotelkit Notifications.
+A Chrome extension to streamline managing Hotelkit notifications by adding a "Delete All" feature.
 
+## Overview
 
-Works by sending POST requests to the server. It uses only the *notifcations/all* and *notifications/delete* endpoints.
+This extension enhances the Hotelkit notifications interface by allowing users to quickly delete all notifications, with options to preserve certain notifications based on tags. It works by sending POST requests to Hotelkit's notification endpoints: `notifications/all` and `notifications/delete`.
 
+## Features
 
+- **Delete All**: Instantly remove all notifications from your inbox.
+- **Selective Deletion**: Delete all notifications except those marked with specific tags.
 
-Features:
-  - Delete all
-  - Delete all notifications except if tagged
-  
+> _"I believe this feature should be built into Hotelkit by default. It may already be available in some hotel implementations, but I am unsure."_
 
-`I personally think this should be a built in feature, it may be available in other hotels though, I dont know`
+## Planned Features
 
+- **Time-based Deletion**: Choose a cutoff period (e.g., delete all notifications older than a week).
+- **Confirmation Prompt**: Add an "Are you sure?" prompt to prevent accidental deletions.
 
+## Disclaimer
 
-Future features:
-1. hello
-1. world
-1. 
-# Use responsibly!
-
+Use responsibly
