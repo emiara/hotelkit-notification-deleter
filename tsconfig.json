@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "ES6",            // Specify the ECMAScript target version
+    "target": "ES2019",            // Specify the ECMAScript target version
     "module": "ESNext",         // Specify module code generation
     "outDir": "./dist",         // Directory where compiled JS files will be saved
     "rootDir": "./src",         // Directory where your TypeScript source files are located
