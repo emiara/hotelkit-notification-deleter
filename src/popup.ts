@@ -13,7 +13,6 @@ deleteAll.onclick = async function(event) {
   const cookies = await getAllCookies(); // Wait for the cookies to be retrieved
   console.log(cookies);
 
-
   // Get the Notifcations
   const bgozhURL = new URL("https://bgozh.hotelkit.net");
   const payload = { type: "notifications" };
@@ -21,13 +20,11 @@ deleteAll.onclick = async function(event) {
   const notifications = await fetchAllNotifications(bgozhURL, cookies, JSON.stringify(payload));
 
   // Get the notificationIDs
-  let notificationIDs = [];
-
-  for (const noti of notifications) {
-    notificationIDs.push(...noti.notificationIDs);
-  }
-
-  console.log("NotificationIds: " + notificationIDs);
+  console.log("NotificationIds: ");
+  let notificationIDs = notifications.flatMap((notification) => {
+    console.log(notification)
+    return notification.notificationIDs
+  })
 
   // Delete the notifications 
   notificationIDs.forEach(id => {

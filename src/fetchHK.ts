@@ -17,14 +17,13 @@ interface Notification {
   userID: string;
 }
 
-// Shared fetchHK function
 async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string): Promise<any> {
   let xxsrftoken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")?.value ?? (() => { throw new Error("XSRF-TOKEN could not be found!"); })();
 
   const response = await fetch(url, {
     headers: {
       "x-xsrf-token": xxsrftoken,
-      "Content-Type": "application/json" // Set content type for JSON
+      "Content-Type": "application/json"
     },
     body: data,
     method: "POST",
@@ -43,23 +42,19 @@ async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string
   }
 }
 
-// Function to fetch all notifications
 export async function fetchAllNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
   const jsonResponse = await fetchHK(new URL("/notifications/all", url), cookies, data);
   return jsonResponse.notifications as Notification[];
 }
 
-// Function to delete a notification
 export async function deleteNotification(url: URL, cookies: chrome.cookies.Cookie[], notificationID: string): Promise<void | { success: boolean; hash: string }> {
   const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, JSON.stringify({ notificationID }));
 
-  // Check for success condition
   if (jsonResponse && jsonResponse.success === false) {
     return {
       success: false,
-      hash: jsonResponse.hash, // Return hash on failure
+      hash: jsonResponse.hash,
     };
   }
-
-  return; // Return nothing on success
+  return;
 }
