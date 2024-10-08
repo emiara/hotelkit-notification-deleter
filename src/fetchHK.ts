@@ -1,5 +1,3 @@
-import * as Cookies from "./cookies.js";
-
 interface Notification {
   headline: string;
   actionTypes: string[];
@@ -38,7 +36,6 @@ async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string
   }
 
   try {
-
     return await response.json()
   } catch (SyntaxError) {
     console.log("No JSON response recieved, probably a delete POST")
