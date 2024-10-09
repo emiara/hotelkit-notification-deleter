@@ -2,41 +2,84 @@ import { getAllCookies } from "./cookies.js";
 import { deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
 
 
-const deleteAll = document.getElementById("deleteAll");
-if (!deleteAll) {
-  throw new Error("Delete all button doesn't exist: " + deleteAll);
+const MAX_DELETED = 2
+const FETCH_SIZE = 5
+const deleteAllButton = document.getElementById("deleteAll");
+const deleteNonMentionedButton = document.getElementById("deleteNonMentioned")
+if (!deleteAllButton) {
+  throw new Error("Delete all button doesn't exist: " + deleteAllButton);
+}
+if (!deleteNonMentionedButton) {
+  throw new Error("Delete non-mentioned button doesn't exist: " + deleteNonMentionedButton)
 }
 
 
 async function deleteAbsolutelyAll(url: URL, cookies: chrome.cookies.Cookie[]): Promise<number> {
   let deletedCount: number = 0
-  while (deletedCount <= 1) { // low number for testing
-    const notifications = await fetchFirstPageNotifications(url, cookies, 5);
+  while (deletedCount <= MAX_DELETED) {
+    const notifications = await fetchFirstPageNotifications(url, cookies, FETCH_SIZE);
     if (notifications.length <= 0) {
       console.log("No more notifications! Great Success 😎")
       return deletedCount
     }
-    // Get the notificationIDs
-    console.log("NotificationIds: ");
     let notificationIdStrings = notifications.map((notification) => {
-      console.log(notification)
       return notification.notificationIDs.join("|") // NotificationIDString format: "abc|xyz"
     })
 
-    // Delete the notifications 
     notificationIdStrings.forEach(idString => {
       const response = deleteNotification(url, cookies, idString);
-      console.log("response: ", response)
+      deletedCount++;
+    })
+  }
+  return deletedCount
+}
+async function deleteNonMentioned(url: URL, cookies: chrome.cookies.Cookie[]): Promise<number> {
+  let deletedCount: number = 0
+  while (deletedCount <= MAX_DELETED) {
+    let notifications = await fetchFirstPageNotifications(url, cookies, FETCH_SIZE);
+
+    if (notifications.length <= 0) {
+      console.log("No more notifications! Great Success 😎")
+      return deletedCount
+    }
+
+    // Filters notifications that mention user
+    notifications = notifications.filter((notification) => !notification.actionTypes.some((type) => type.endsWith("MentionUser")))
+
+    let notificationIdStrings = notifications.map((notification) => {
+      return notification.notificationIDs.join("|") // NotificationIDString format: "abc|xyz"
+    })
+
+    notificationIdStrings.forEach(idString => {
+      deleteNotification(url, cookies, idString);
       deletedCount++;
     })
   }
   return deletedCount
 }
 
-deleteAll.onclick = async function(event) {
-  const cookies = await getAllCookies(); // Wait for the cookies to be retrieved
+deleteAllButton.addEventListener('click', async () => {
+  showResult('Processing all deletions...');
+  const cookies = await getAllCookies();
   const bgozhURL = new URL("https://bgozh.hotelkit.net");
+  const total = await deleteAbsolutelyAll(bgozhURL, cookies);
+  showResult(`Deleted ${total} notifications!`)
+});
 
-  console.log("Cookies", cookies);
-  console.log("Notifcations deleted", deleteAbsolutelyAll(bgozhURL, cookies))
+deleteNonMentionedButton.addEventListener('click', async () => {
+  showResult('Processing non-mentioned notifications...');
+  const cookies = await getAllCookies();
+  const bgozhURL = new URL("https://bgozh.hotelkit.net");
+  const total = await deleteNonMentioned(bgozhURL, cookies);
+  showResult(`Deleted ${total} notifications!`)
+});
+
+function showResult(message: string) {
+  const resultDiv = document.getElementById('result');
+  if (!resultDiv) {
+    throw new Error("Result div doesn't exist: " + resultDiv);
+  }
+  resultDiv.innerText = message;
+  resultDiv.hidden = false;
 }
+
