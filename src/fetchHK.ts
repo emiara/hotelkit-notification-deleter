@@ -42,13 +42,19 @@ async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string
   }
 }
 
+//TODO: figure out if itemTitle are always part of a notification, and if: update the INotification
+export async function fetchFirstPageNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
+  const jsonResponse = await fetchHK(new URL("/notification/first-page?count=5", url), cookies, data); // 99 is the maximum
+  return jsonResponse.notifications as Notification[];
+}
+
 export async function fetchAllNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
   const jsonResponse = await fetchHK(new URL("/notifications/all", url), cookies, data);
   return jsonResponse.notifications as Notification[];
 }
 
 export async function deleteNotification(url: URL, cookies: chrome.cookies.Cookie[], notificationID: string): Promise<void | { success: boolean; hash: string }> {
-  const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, JSON.stringify({ notificationID }));
+  const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, JSON.stringify({ notificationIDString: notificationID }));
 
   if (jsonResponse && jsonResponse.success === false) {
     return {

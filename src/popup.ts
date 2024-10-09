@@ -1,5 +1,5 @@
 import { getAllCookies } from "./cookies.js";
-import { fetchAllNotifications, deleteNotification } from "./fetchHK.js";
+import { fetchAllNotifications, deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
 
 
 const deleteAll = document.getElementById("deleteAll");
@@ -17,8 +17,9 @@ deleteAll.onclick = async function(event) {
   const bgozhURL = new URL("https://bgozh.hotelkit.net");
   const payload = { type: "notifications" };
 
-  while (true) {
-    const notifications = await fetchAllNotifications(bgozhURL, cookies, JSON.stringify(payload));
+  let deletedCount = 0
+  while (deletedCount <= 1) {
+    const notifications = await fetchFirstPageNotifications(bgozhURL, cookies, JSON.stringify({ ...payload, first: `${24 + (25 * deletedCount)},1,0,0` }));
     if (notifications.length <= 0) {
       console.log("No more notifications! Great Success 😎")
       break
@@ -35,6 +36,7 @@ deleteAll.onclick = async function(event) {
       const response = deleteNotification(bgozhURL, cookies, id);
       console.log("response: " + response)
     });
+    deletedCount++;
   }
+  console.log("Notifcations deleted: " + deletedCount)
 }
-
