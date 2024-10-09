@@ -17,7 +17,7 @@ interface Notification {
   userID: string;
 }
 
-async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string): Promise<any> {
+async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], method: string, data?: string): Promise<any> {
   let xxsrftoken = cookies.find((cookie) => cookie.name === "XSRF-TOKEN")?.value ?? (() => { throw new Error("XSRF-TOKEN could not be found!"); })();
 
   const response = await fetch(url, {
@@ -26,7 +26,7 @@ async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string
       "Content-Type": "application/json"
     },
     body: data,
-    method: "POST",
+    method: method,
   });
 
   if (!response.ok) {
@@ -43,18 +43,18 @@ async function fetchHK(url: URL, cookies: chrome.cookies.Cookie[], data?: string
 }
 
 //TODO: figure out if itemTitle are always part of a notification, and if: update the INotification
-export async function fetchFirstPageNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
-  const jsonResponse = await fetchHK(new URL("/notification/first-page?count=5", url), cookies, data); // 99 is the maximum
+export async function fetchFirstPageNotifications(url: URL, cookies: chrome.cookies.Cookie[], count: number): Promise<Notification[]> {
+  const jsonResponse = await fetchHK(new URL(`/notification/first-page?count=${count}`, url), cookies, "GET"); // 99 is the maximum
   return jsonResponse.notifications as Notification[];
 }
 
 export async function fetchAllNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
-  const jsonResponse = await fetchHK(new URL("/notifications/all", url), cookies, data);
+  const jsonResponse = await fetchHK(new URL("/notifications/all", url), cookies, "POST", data);
   return jsonResponse.notifications as Notification[];
 }
 
 export async function deleteNotification(url: URL, cookies: chrome.cookies.Cookie[], notificationID: string): Promise<void | { success: boolean; hash: string }> {
-  const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, JSON.stringify({ notificationIDString: notificationID }));
+  const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, "POST", JSON.stringify({ notificationIDString: notificationID }));
 
   if (jsonResponse && jsonResponse.success === false) {
     return {

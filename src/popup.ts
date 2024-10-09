@@ -1,42 +1,42 @@
 import { getAllCookies } from "./cookies.js";
-import { fetchAllNotifications, deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
+import { deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
 
 
 const deleteAll = document.getElementById("deleteAll");
-
 if (!deleteAll) {
   throw new Error("Delete all button doesn't exist: " + deleteAll);
 }
 
-deleteAll.onclick = async function(event) {
-  console.log("Get all cookies:");
-  const cookies = await getAllCookies(); // Wait for the cookies to be retrieved
-  console.log(cookies);
 
-  // Get the Notifcations
-  const bgozhURL = new URL("https://bgozh.hotelkit.net");
-  const payload = { type: "notifications" };
-
-  let deletedCount = 0
-  while (deletedCount <= 1) {
-    const notifications = await fetchFirstPageNotifications(bgozhURL, cookies, JSON.stringify({ ...payload, first: `${24 + (25 * deletedCount)},1,0,0` }));
+async function deleteAbsolutelyAll(url: URL, cookies: chrome.cookies.Cookie[]): Promise<number> {
+  let deletedCount: number = 0
+  while (deletedCount <= 1) { // low number for testing
+    const notifications = await fetchFirstPageNotifications(url, cookies, 5);
     if (notifications.length <= 0) {
       console.log("No more notifications! Great Success 😎")
-      break
+      return deletedCount
     }
     // Get the notificationIDs
     console.log("NotificationIds: ");
-    let notificationIDs = notifications.flatMap((notification) => {
+    let notificationIdStrings = notifications.map((notification) => {
       console.log(notification)
-      return notification.notificationIDs
+      return notification.notificationIDs.join("|") // NotificationIDString format: "abc|xyz"
     })
 
     // Delete the notifications 
-    notificationIDs.forEach(id => {
-      const response = deleteNotification(bgozhURL, cookies, id);
-      console.log("response: " + response)
-    });
-    deletedCount++;
+    notificationIdStrings.forEach(idString => {
+      const response = deleteNotification(url, cookies, idString);
+      console.log("response: ", response)
+      deletedCount++;
+    })
   }
-  console.log("Notifcations deleted: " + deletedCount)
+  return deletedCount
+}
+
+deleteAll.onclick = async function(event) {
+  const cookies = await getAllCookies(); // Wait for the cookies to be retrieved
+  const bgozhURL = new URL("https://bgozh.hotelkit.net");
+
+  console.log("Cookies", cookies);
+  console.log("Notifcations deleted", deleteAbsolutelyAll(bgozhURL, cookies))
 }
