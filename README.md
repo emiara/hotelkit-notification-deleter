@@ -4,7 +4,7 @@ A Chrome extension to streamline managing Hotelkit notifications by adding a "De
 
 ## Overview
 
-This extension enhances the Hotelkit notifications interface by allowing users to quickly delete all notifications, with options to preserve certain notifications based on tags. It works by sending POST requests to Hotelkit's notification endpoints: `notifications/all` and `notifications/delete`.
+This extension enhances the Hotelkit notifications interface by allowing users to quickly delete all notifications, with options to preserve certain notifications based on tags. It works by sending POST requests to Hotelkit's notification endpoints: `/notification/first-page?count=` and `notifications/delete`.
 
 ## Features
 
