@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "publish": "npm run build && zip -r -o ../hotelkit-notification-deleter.zip ."
   },
   "devDependencies": {
     "@types/chrome": "^0.0.277",

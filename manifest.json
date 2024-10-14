@@ -3,7 +3,7 @@
   "name": "Hotelkit Notification Deleter",
   "version": "1.1.0",
   "background": {
-    "service_worker": "./dist/background.js", // Compiled JS file from TS
+    "service_worker": "./dist/background.js",
     "type": "module"
   },
   "action": {
@@ -16,7 +16,6 @@
     "cookies"
   ],
   "host_permissions": [
-    "https://bgozh.hotelkit.net/*" // Needed to access cookies
+    "https://bgozh.hotelkit.net/*"
   ]
-
 }
