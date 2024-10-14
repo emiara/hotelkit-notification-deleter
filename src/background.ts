@@ -2,8 +2,8 @@ import { getAllCookies } from "./cookies.js";
 import { deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
 
 
-const MAX_DELETED = 2
-const FETCH_SIZE = 5
+const MAX_DELETED = 2048
+const FETCH_SIZE = 99
 const BGOZHURL = new URL("https://bgozh.hotelkit.net");
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
@@ -25,7 +25,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 async function deleteAbsolutelyAll(): Promise<number> {
   const COOKIES = await getAllCookies();
   let deletedCount: number = 0
-  while (deletedCount <= MAX_DELETED) {
+  while (deletedCount < MAX_DELETED) {
     const notifications = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
     if (notifications.length <= 0) {
       console.log("No more notifications! Great Success 😎")
@@ -45,7 +45,7 @@ async function deleteAbsolutelyAll(): Promise<number> {
 async function deleteNonMentioned(): Promise<number> {
   const COOKIES = await getAllCookies();
   let deletedCount: number = 0
-  while (deletedCount <= MAX_DELETED) {
+  while (deletedCount < MAX_DELETED) {
     let notifications = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
 
     if (notifications.length <= 0) {
