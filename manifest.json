@@ -3,7 +3,8 @@
   "name": "Hotelkit Notification Deleter",
   "version": "1.1.0",
   "background": {
-    "service_worker": "./dist/background.js" // Compiled JS file from TS
+    "service_worker": "./dist/background.js", // Compiled JS file from TS
+    "type": "module"
   },
   "action": {
     "default_icon": "./assets/action_icon.png",
