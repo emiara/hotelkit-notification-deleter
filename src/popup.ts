@@ -1,4 +1,3 @@
-
 const deleteAllButton = document.getElementById("deleteAll");
 const deleteNonMentionedButton = document.getElementById("deleteNonMentioned")
 if (!deleteAllButton) {

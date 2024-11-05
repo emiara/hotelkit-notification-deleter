@@ -3,7 +3,7 @@ import { deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
 
 
 const MAX_DELETED = 2048
-const FETCH_SIZE = 99
+const FETCH_SIZE = 99 // Maximum supported by hotelkit API: 99
 // TODO: Generalize url to any hotelkit subdomain
 const BGOZHURL = new URL("https://bgozh.hotelkit.net");
 
