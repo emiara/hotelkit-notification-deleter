@@ -11,8 +11,6 @@
     "default_popup": "./dist/popup.html"
   },
   "permissions": [
-    "tabs",
-    "scripting",
     "cookies"
   ],
   "host_permissions": [

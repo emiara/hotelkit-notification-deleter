@@ -6,6 +6,7 @@ if (!deleteAllButton) {
 if (!deleteNonMentionedButton) {
   throw new Error("Delete non-mentioned button doesn't exist: " + deleteNonMentionedButton)
 }
+
 deleteAllButton.addEventListener('click', async () => {
   showResult('Processing all deletions...');
   chrome.runtime.sendMessage(
@@ -34,4 +35,3 @@ function showResult(message: string) {
   resultDiv.innerText = message;
   resultDiv.hidden = false;
 }
-
