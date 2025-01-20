@@ -1,70 +1,55 @@
 import { getAllCookies } from "./cookies.js";
-import { deleteNotification, fetchFirstPageNotifications } from "./fetchHK.js";
+import { deleteNotification, fetchFirstPageNotifications, Notification } from "./fetchHK.js";
 
-
-const MAX_DELETED = 2048
-const FETCH_SIZE = 99 // Maximum supported by hotelkit API: 99
-// TODO: Generalize url to any hotelkit subdomain
+const MAX_DELETED = 2048;
+const FETCH_SIZE = 99;
 const BGOZHURL = new URL("https://bgozh.hotelkit.net");
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+  const COOKIES = await getAllCookies();
+
   if (request.action === 'deleteAll') {
-    deleteAbsolutelyAll().then(total => {
+    const notifications: Notification[] = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
+    deleteNotificationsByID(() => true).then(total => {
       sendResponse({ total });
     });
     return true; // Indicating we will send a response asynchronously
   }
 
   if (request.action === 'deleteNonMentioned') {
-    deleteNonMentioned().then(total => {
+    deleteNotificationsByID((notification) =>
+      !notification.actionTypes.some(type => type.endsWith("MentionUser"))
+    ).then(total => {
       sendResponse({ total });
     });
     return true;
   }
 });
 
-async function deleteAbsolutelyAll(): Promise<number> {
+async function deleteNotificationsByID(
+  filterFn: (notification: Notification) => boolean
+): Promise<number> {
   const COOKIES = await getAllCookies();
-  let deletedCount: number = 0
-  while (deletedCount < MAX_DELETED) {
-    const notifications = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
-    if (notifications.length <= 0) {
-      console.log("No more notifications! Great Success 😎")
-      return deletedCount
-    }
-    let notificationIdStrings = notifications.map((notification) => {
-      return notification.notificationIDs.join("|") // NotificationIDString format: "abc|xyz"
-    })
+  let notifications: Notification[] = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
+  let deletedCount = 0;
 
-    notificationIdStrings.forEach(idString => {
-      const response = deleteNotification(BGOZHURL, COOKIES, idString);
+  notifications = notifications.filter(filterFn);
+
+  while (deletedCount < MAX_DELETED && notifications.length > 0) {
+    const notificationIdStrings = notifications.map(notification =>
+      notification.notificationIDs.join("|") // NotificationIDString format: "abc|xyz"
+    );
+
+    for (const idString of notificationIdStrings) {
+      await deleteNotification(BGOZHURL, COOKIES, idString);
       deletedCount++;
-    })
-  }
-  return deletedCount
-}
-async function deleteNonMentioned(): Promise<number> {
-  const COOKIES = await getAllCookies();
-  let deletedCount: number = 0
-  while (deletedCount < MAX_DELETED) {
-    let notifications = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
-
-    if (notifications.length <= 0) {
-      console.log("No more notifications! Great Success 😎")
-      return deletedCount
+      if (deletedCount >= MAX_DELETED) break;
     }
 
-    // Filters notifications that mention user
-    notifications = notifications.filter((notification) => !notification.actionTypes.some((type) => type.endsWith("MentionUser")))
-
-    let notificationIdStrings = notifications.map((notification) => {
-      return notification.notificationIDs.join("|") // NotificationIDString format: "abc|xyz"
-    })
-
-    notificationIdStrings.forEach(idString => {
-      deleteNotification(BGOZHURL, COOKIES, idString);
-      deletedCount++;
-    })
+    // Fetch the next batch of notifications
+    notifications = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
+    notifications = notifications.filter(filterFn); // Reapply the filter for the new batch
   }
-  return deletedCount
+
+  return deletedCount;
 }

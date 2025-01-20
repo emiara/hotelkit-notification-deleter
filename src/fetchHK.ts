@@ -1,4 +1,4 @@
-interface Notification {
+export interface Notification {
   headline: string;
   actionTypes: string[];
   texts: string[];
