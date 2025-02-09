@@ -3,15 +3,14 @@ import { deleteNotification, fetchFirstPageNotifications, Notification } from ".
 
 const MAX_DELETED = 2048;
 const FETCH_SIZE = 99;
-const BGOZHURL = new URL("https://bgozh.hotelkit.net");
 
 chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
-  const COOKIES = await getAllCookies();
+  const COOKIES = await getAllCookies(new URL(request.hotelkitURL));
 
   if (request.action === 'deleteAll') {
-    const notifications: Notification[] = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
-    deleteNotificationsByID(() => true).then(total => {
-      sendResponse({ total });
+    const notifications: Notification[] = await fetchFirstPageNotifications(request.hotelkitURL, COOKIES, FETCH_SIZE);
+    deleteNotificationsByID(() => true, request.hotelkitURL).then(deletedCount => {
+      sendResponse({ deletedCount });
     });
     return true; // Indicating we will send a response asynchronously
   }
@@ -19,18 +18,20 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
   if (request.action === 'deleteNonMentioned') {
     deleteNotificationsByID((notification) =>
       !notification.actionTypes.some(type => type.endsWith("MentionUser"))
-    ).then(total => {
-      sendResponse({ total });
-    });
+      , request.hotelkitURL).then(deletedCount => {
+        sendResponse({ deletedCount });
+      });
     return true;
   }
 });
 
 async function deleteNotificationsByID(
-  filterFn: (notification: Notification) => boolean
+  filterFn: (notification: Notification) => boolean,
+  hotelkitURL: string
+
 ): Promise<number> {
-  const COOKIES = await getAllCookies();
-  let notifications: Notification[] = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
+  const COOKIES = await getAllCookies(new URL(hotelkitURL));
+  let notifications: Notification[] = await fetchFirstPageNotifications(new URL(hotelkitURL), COOKIES, FETCH_SIZE);
   let deletedCount = 0;
 
   notifications = notifications.filter(filterFn);
@@ -41,13 +42,13 @@ async function deleteNotificationsByID(
     );
 
     for (const idString of notificationIdStrings) {
-      await deleteNotification(BGOZHURL, COOKIES, idString);
+      await deleteNotification(new URL(hotelkitURL), COOKIES, idString);
       deletedCount++;
       if (deletedCount >= MAX_DELETED) break;
     }
 
     // Fetch the next batch of notifications
-    notifications = await fetchFirstPageNotifications(BGOZHURL, COOKIES, FETCH_SIZE);
+    notifications = await fetchFirstPageNotifications(new URL(hotelkitURL), COOKIES, FETCH_SIZE);
     notifications = notifications.filter(filterFn); // Reapply the filter for the new batch
   }
 

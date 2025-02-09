@@ -48,11 +48,6 @@ export async function fetchFirstPageNotifications(url: URL, cookies: chrome.cook
   return jsonResponse.notifications as Notification[];
 }
 
-export async function fetchAllNotifications(url: URL, cookies: chrome.cookies.Cookie[], data: string): Promise<Notification[]> {
-  const jsonResponse = await fetchHK(new URL("/notifications/all", url), cookies, "POST", data);
-  return jsonResponse.notifications as Notification[];
-}
-
 export async function deleteNotification(url: URL, cookies: chrome.cookies.Cookie[], notificationID: string): Promise<void | { success: boolean; hash: string }> {
   const jsonResponse = await fetchHK(new URL("/notification/delete", url), cookies, "POST", JSON.stringify({ notificationIDString: notificationID }));
 
